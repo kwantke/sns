@@ -1,12 +1,16 @@
 package com.project.sns.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.sns.controller.request.PostCreateRequest;
 import com.project.sns.controller.request.UserJoinRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,11 +28,29 @@ public class PostControllerTest {
   private ObjectMapper objectMapper;
 
   @Test
-  void name() {
+  @WithMockUser
+  void 포트스작성() throws Exception {
+
+    String title = "title";
+    String body = "body";
 
     mockMvc.perform(post("/api/v1/post")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(new UserJoinRequest()))
+                    .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title,body)))
+            ).andDo(print())
+            .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithAnonymousUser
+  void 포트스작성시_로그인하지않은경우() throws Exception {
+
+    String title = "title";
+    String body = "body";
+
+    mockMvc.perform(post("/api/v1/post")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title,body)))
             ).andDo(print())
             .andExpect(status().isOk());
   }
