@@ -16,9 +16,13 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       schema: test
+  jackson:
+    time-zone: Asia/Seoul
 
 
 jwt:
   secret-key: fast_campus.sns-application-2024.secret_key
   # 30 days
   token.expired-time-ms: 2592000000
+
+spring.redis.url: redis://127.0.0.1:6379
