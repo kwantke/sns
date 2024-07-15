@@ -27,7 +27,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(WebSecurity web) throws Exception {
-    web.ignoring().regexMatchers("^(?!/api/).*")
+    web.ignoring().regexMatchers("^(?!/api/).*") // api 로 시작하는 서비스가 아닌것은 ignore 한다.
             .antMatchers(HttpMethod.POST,"/api/*/users/join","/api/*/users/login");
   }
 
