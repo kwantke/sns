@@ -2,6 +2,7 @@ package com.project.sns.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.sns.controller.request.PostCommentRequest;
 import com.project.sns.controller.request.PostCreateRequest;
 import com.project.sns.controller.request.PostModifyRequest;
 import com.project.sns.controller.request.UserJoinRequest;
@@ -49,7 +50,7 @@ public class PostControllerTest {
     String title = "title";
     String body = "body";
 
-    mockMvc.perform(post("/api/v1/post")
+    mockMvc.perform(post("/api/v1/posts")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title,body)))
             ).andDo(print())
@@ -65,7 +66,7 @@ public class PostControllerTest {
 
     doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).create(eq(title), eq(body), any());
 
-    mockMvc.perform(post("/api/v1/post")
+    mockMvc.perform(post("/api/v1/posts")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(new PostCreateRequest(title,body)))
             ).andDo(print())
@@ -81,7 +82,7 @@ public class PostControllerTest {
     when(postService.modify(eq(title), eq(body), any(), any()))
             .thenReturn(Post.fromEntity(PostEntityFixture.get("userName", 1, 1)));
 
-    mockMvc.perform(put("/api/v1/post/1")
+    mockMvc.perform(put("/api/v1/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
             ).andDo(print())
@@ -95,7 +96,7 @@ public class PostControllerTest {
     String title = "title";
     String body = "body";
 
-    mockMvc.perform(put("/api/v1/post/1")
+    mockMvc.perform(put("/api/v1/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
             ).andDo(print())
@@ -111,7 +112,7 @@ public class PostControllerTest {
     // mocking
     doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).modify(eq(title),eq(body),any(),eq(1));
 
-    mockMvc.perform(put("/api/v1/post/1")
+    mockMvc.perform(put("/api/v1/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
             ).andDo(print())
@@ -129,7 +130,7 @@ public class PostControllerTest {
     doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).modify(eq(title), eq(body),any(), eq(1));
 
 
-    mockMvc.perform(put("/api/v1/post/1")
+    mockMvc.perform(put("/api/v1/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
             ).andDo(print())
@@ -139,7 +140,7 @@ public class PostControllerTest {
   @Test
   @WithMockUser
   void 포트스삭제() throws Exception {
-    mockMvc.perform(delete("/api/v1/post/1")
+    mockMvc.perform(delete("/api/v1/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
             .andExpect(status().isOk() );
@@ -148,7 +149,7 @@ public class PostControllerTest {
   @Test
   @WithAnonymousUser
   void 포트스삭제시_로그인하지_않은경우() throws Exception {
-    mockMvc.perform(delete("/api/v1/post/1")
+    mockMvc.perform(delete("/api/v1/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
             .andExpect(status().isUnauthorized() );
@@ -160,7 +161,7 @@ public class PostControllerTest {
     //mocking
     doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).delete(any(),any());
 
-    mockMvc.perform(delete("/api/v1/post/1")
+    mockMvc.perform(delete("/api/v1/posts/1")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
             .andExpect(status().isUnauthorized() );
@@ -173,7 +174,7 @@ public class PostControllerTest {
     // return 이 void로 없다. 그래서 doThrow() 함수로 함.
     doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).delete(any(),any());
 
-    mockMvc.perform(delete("/api/v1/post/4")
+    mockMvc.perform(delete("/api/v1/posts/4")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
             .andExpect(status().isNotFound() );
@@ -184,7 +185,7 @@ public class PostControllerTest {
   void 피드목록() throws Exception {
     //TODO : mocking
     when(postService.list(any())).thenReturn(Page.empty());
-    mockMvc.perform(get("/api/v1/post")
+    mockMvc.perform(get("/api/v1/posts")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
             .andExpect(status().isOk() );
@@ -196,7 +197,7 @@ public class PostControllerTest {
     //TODO : mocking
     when(postService.list(any())).thenReturn(Page.empty());
 
-    mockMvc.perform(get("/api/v1/post")
+    mockMvc.perform(get("/api/v1/posts")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
             .andExpect(status().isUnauthorized() );
@@ -208,10 +209,10 @@ public class PostControllerTest {
     //TODO : mocking
     when(postService.my(any(), any())).thenReturn(Page.empty());
 
-    mockMvc.perform(get("/api/v1/post/my")
+    mockMvc.perform(get("/api/v1/posts/my")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
-            .andExpect(status().isNotFound() );
+            .andExpect(status().isOk() );
   }
 
   @Test
@@ -220,9 +221,74 @@ public class PostControllerTest {
     //TODO : mocking
     when(postService.my(any(), any())).thenReturn(Page.empty());
 
-    mockMvc.perform(get("/api/v1/post/my")
+    mockMvc.perform(get("/api/v1/posts/my")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print())
             .andExpect(status().isUnauthorized() );
+  }
+
+  @Test
+  @WithMockUser
+  void 좋아요기능() throws Exception {
+
+    mockMvc.perform(post("/api/v1/posts/1/likes")
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andDo(print())
+            .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithAnonymousUser
+  void 좋아요버튼클릭시_로그인하지_않을경우() throws Exception {
+
+    mockMvc.perform(post("/api/v1/posts/1/likes")
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andDo(print())
+            .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @WithMockUser
+  void 좋아요버튼클릭시_게시물이_없는경우() throws Exception {
+    doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).like(any(), any());
+
+    mockMvc.perform(post("/api/v1/posts/1/likes")
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andDo(print())
+            .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @WithMockUser
+  void 댓글기능() throws Exception {
+
+    mockMvc.perform(post("/api/v1/posts/1/comments")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+            ).andDo(print())
+            .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithAnonymousUser
+  void 댓글장성시_로그인하지_않을경우() throws Exception {
+
+    mockMvc.perform(post("/api/v1/posts/1/comments")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+            ).andDo(print())
+            .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @WithMockUser
+  void 댓글작성시_게시물이_없는경우() throws Exception {
+    doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).comment(any(), any(), any());
+
+    mockMvc.perform(post("/api/v1/posts/1/comments")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+            ).andDo(print())
+            .andExpect(status().isNotFound());
   }
 }
