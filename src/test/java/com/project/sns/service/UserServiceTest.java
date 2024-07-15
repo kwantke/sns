@@ -80,7 +80,6 @@ public class UserServiceTest {
   void 로그인시_userName으로_회원가입한_유저가_없는_경우() {
     String userName = "userName";
     String password = "password";
-    UserEntity fixture= UserEntityFixture.get(userName, password,1);
 
     when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
