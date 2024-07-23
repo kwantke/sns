@@ -2,13 +2,17 @@ package com.project.sns.service;
 
 import com.project.sns.exception.ErrorCode;
 import com.project.sns.exception.SnsApplicationException;
+import com.project.sns.model.Alarm;
 import com.project.sns.model.User;
 import com.project.sns.model.entity.UserEntity;
+import com.project.sns.repository.AlarmEntityRepository;
 import com.project.sns.repository.UserCacheRepository;
 import com.project.sns.repository.UserEntityRepository;
 import com.project.sns.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,7 @@ public class UserService {
 
   private final UserEntityRepository userEntityRepository;
   private final UserCacheRepository userCacheRepository;
+  private final AlarmEntityRepository alarmEntityRepository;
   private final BCryptPasswordEncoder encoder;
 
   @Value("${jwt.secret-key}")
@@ -26,6 +31,7 @@ public class UserService {
 
   @Value("${jwt.token.expired-time-ms}")
   private Long expiredTimeMs = 0L;
+
 
   public User loadUserByUserName(String userName) {
     //cache에 user 정보가 없을수 있으므로 getUSer 타입을 Optional로 한다음 정보가 없을 경우 orElseGet을 사용하여 DB 에서 데이터 조회를 하는 로직
@@ -63,7 +69,13 @@ public class UserService {
     }
 
     // 토큰 생성
-
     return JwtTokenUtils.generateToken(userName,secretKey, expiredTimeMs);
+  }
+
+  // TODO : alarm return
+  public Page<Alarm> alarmList(String userName, Pageable pageable){
+    UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND,String.format("%s not founded", userName)));
+
+    return alarmEntityRepository.findAllByUser(userEntity, pageable).map(Alarm::fromEntity);
   }
 }
