@@ -10,9 +10,10 @@ spring.jpa:
 spring:
   datasource:
     hikari.maximum-pool-size: 4
-    url: jdbc:postgresql://postgresql-1.cfh61qv9x1da.us-west-2.rds.amazonaws.com/postgres
-    username: postgres
-    password: postgres
+    #url: jdbc:postgresql://postgresql-1.cfh61qv9x1da.us-west-2.rds.amazonaws.com/postgres
+    url: jdbc:postgresql://localhost/test_db
+    username: test_user
+    password: test1234
     driver-class-name: org.postgresql.Driver
     hikari:
       schema: test
