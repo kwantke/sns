@@ -1,6 +1,5 @@
 package com.project.sns.model.entity;
 
-
 import com.project.sns.model.UserRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,24 +13,24 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"user\"") // postgresql 에 user 테이블이 기존에 존재하기
-@SQLDelete(sql = "update \"user\" set deleted_at = new() where id=? ")
+@Table(name = "\"post\"")
+@SQLDelete(sql = "update \"post\" set deleted_at = now() where id = ?")
 @Where(clause = "deleted_at is null")
-public class UserEntity {
+public class PostEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(name = "user_name")
-  private String userName;
+  @Column(name = "title")
+  private String title;
 
-  @Column(name = "password")
-  private String password;
+  @Column(name = "body", columnDefinition = "TEXT")
+  private String body;
 
-  @Column(name = "role")
-  @Enumerated(EnumType.STRING)
-  private UserRole role = UserRole.USER;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private UserEntity user;
   @Column(name = "registered_at")
   private Timestamp registeredAt;
 
@@ -51,10 +50,12 @@ public class UserEntity {
     this.updatedAt = Timestamp.from(Instant.now());
   }
 
-  public static UserEntity of(String userName, String password){
-    UserEntity userEntity = new UserEntity();
-    userEntity.setUserName(userName);
-    userEntity.setPassword(password);
-    return userEntity;
+  public static PostEntity of(String title, String body, UserEntity userEntity) {
+    PostEntity entity = new PostEntity();
+    entity.setTitle(title);
+    entity.setBody(body);
+    entity.setUser(userEntity);
+    return entity;
   }
+
 }

@@ -1,7 +1,5 @@
 package com.project.sns.model.entity;
 
-
-import com.project.sns.model.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -14,24 +12,23 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"user\"") // postgresql 에 user 테이블이 기존에 존재하기
-@SQLDelete(sql = "update \"user\" set deleted_at = new() where id=? ")
+@Table(name = "\"like\"")
+@SQLDelete(sql = "update \"like\" set deleted_at = now() where id = ?")
 @Where(clause = "deleted_at is null")
-public class UserEntity {
+public class LikeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(name = "user_name")
-  private String userName;
 
-  @Column(name = "password")
-  private String password;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private UserEntity user;
+  @ManyToOne
+  @JoinColumn(name="post_id")
+  private PostEntity post;
 
-  @Column(name = "role")
-  @Enumerated(EnumType.STRING)
-  private UserRole role = UserRole.USER;
   @Column(name = "registered_at")
   private Timestamp registeredAt;
 
@@ -51,10 +48,11 @@ public class UserEntity {
     this.updatedAt = Timestamp.from(Instant.now());
   }
 
-  public static UserEntity of(String userName, String password){
-    UserEntity userEntity = new UserEntity();
-    userEntity.setUserName(userName);
-    userEntity.setPassword(password);
-    return userEntity;
+  public static LikeEntity of(UserEntity userEntity, PostEntity postEntity) {
+    LikeEntity entity = new LikeEntity();
+    entity.setUser(userEntity);
+    entity.setPost(postEntity);
+    return entity;
   }
+
 }
