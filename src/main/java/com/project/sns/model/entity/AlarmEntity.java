@@ -30,7 +30,7 @@ public class AlarmEntity {
   private Integer id;
 
   // 알림을 받은 사람
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY) // LAZY 는 user 정보가 있는징 없는지 상관없이 Alarm 테이블을 조회하여 가져온다. default는 EAGER
   @JoinColumn(name = "user_id")
   private UserEntity user;
 

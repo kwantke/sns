@@ -3,9 +3,11 @@ package com.project.sns.model;
 import com.project.sns.model.entity.AlarmEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 
+@Slf4j
 @Getter
 @AllArgsConstructor
 public class Alarm {
@@ -18,6 +20,7 @@ public class Alarm {
   private Timestamp deletedAt;
 
   public static Alarm fromEntity(AlarmEntity entity) {
+    log.info("===Call fromEntity");
     return new Alarm(
             entity.getId(),
             User.fromEntity(entity.getUser()),
