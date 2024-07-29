@@ -1,13 +1,13 @@
-spring.jpa:
-  database: postgresql
-  hibernate:
-    ddl-auto: update
-  properties:
-    dialect: org.hibernate.dialect.PostgreSQL82Dialect
-    hibernate.format_sql: true
-  show-sql: true
-
 spring:
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQL82Dialect
+      hibernate.format_sql: true
+    show-sql: true
+
   datasource:
     hikari.maximum-pool-size: 4
     #url: jdbc:postgresql://postgresql-1.cfh61qv9x1da.us-west-2.rds.amazonaws.com/postgres
@@ -19,11 +19,31 @@ spring:
       schema: test
   jackson:
     time-zone: Asia/Seoul
-
+  kafka:
+    consumer:
+      properties:
+        spring.json.trusted.packages: "*"
+      bootstrap-servers: localhost:9092
+      group-id: alarm
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    listener:
+      ack-mode: MANUAL
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    topic:
+      alarm: topic1
+  redis.url: redis://127.0.0.1:6379
 
 jwt:
   secret-key: fast_campus.sns-application-2024.secret_key
   # 30 days
   token.expired-time-ms: 2592000000
 
-spring.redis.url: redis://127.0.0.1:6379
+
+
+
+
